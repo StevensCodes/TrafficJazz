@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+        <!-- Page Title -->
+        <title>TrafficJazz</title>
+        <!-- Favicon -->
+        <link rel="shortcut icon" type="image/png" href="/trafficJazzLogo.png">
+
+
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+
+        <!-- My own CSS -->
+        <link rel="stylesheet" type="text/css" href="/style.css">
+
+        <!-- A google font inclusion example -->
+
+        
+        <!-- Font Awesome -->    
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.10/css/all.css" integrity="sha384-+d0P83n9kaQMCwj8F4RJB66tzIwOKmrdb46+porD/OvrJ+37WqIM7UoBtwHO6Nlg" crossorigin="anonymous">
+
+        
+        <!-- Load c3.css -->
+		<link href="https://cdnjs.cloudflare.com/ajax/libs/c3/0.6.0/c3.min.css" rel="stylesheet">
+
+		<!-- Load d3.js and c3.js -->
+		<script src="https://d3js.org/d3.v4.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/c3/0.6.0/c3.min.js"></script>
+        
+        
+    </head>
+    <body>
+        <nav class="navbar fixed-top navbar-expand-lg navbar-light" style="background-color: white;">
+            <div class="container">
+                <a href="/"><img src="/trafficJazzMenuLogo.png" class="top-left-logo-large"></a>
+                <a href="/"><img src="/trafficJazzMenuLogo.png" width="190" class="top-left-logo-small"></a>
+                
+                <div id="message" style="margin-left: 35px;"><%= message %></div>
+                
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav ml-auto">
+
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" style="margin-right: 50px;" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">About</a>
+                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <a class="dropdown-item" href="https://www.linkedin.com/in/istvan-rimaszombati-b6251047" target="_blank"><img src="/LinkedInLogo.png" height="20"> Linked In Profile</a>
+                                <a class="dropdown-item" href="https://github.com/StevensCodes/TrafficJazz" target="_blank"><img src="GithubLogo.png" height="20">  Git Hub Page</a>
+                            </div>
+                        </li>
+
+
+                        <% if(!currentUser){ %>
+                            <li class="nav-item">
+                                <button class="nav-link" id="login" data-target="#loginModal" data-toggle="modal" ><i class="fas fa-user"></i> Login</button>
+                            </li>
+                            <li class="nav-item">
+                                <button class="nav-link" id="sign-up" data-target="#registerModal" data-toggle="modal" >Sign Up</button>
+                            </li>
+                        <% } else { %>
+                            <li class="nav-item">
+                                <a class="nav-link" id="currentUser" href="/routes"><i class="fas fa-user"></i> <%= currentUser.username %></a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="logout" href="/logout" >Logout</a>
+                            </li>
+                        <% } %>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        
+        <div class="modal fade" tabindex="-1" id="loginModal" data-keyboard="false" data-backdrop="static">
+            <div class="modal-dialog modal-sm">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="loginModalLongTitle">Login</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form action="/login" method="POST" >
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label for="inputUserName">Username</label>
+                                <input class="form-control" placeholder="Username" type="text" id="loginInputUserName" name = "username" required/>
+                            </div>
+                            <div class="form-group">
+                                <label for="inputPassword">Password</label>
+                                <input class="form-control" placeholder="Password" type="password" id="loginInputPassword" name="password" required />
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-primary">Log In</button>
+                            <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="modal fade" tabindex="-1" id="registerModal" data-keyboard="false" data-backdrop="static">
+            <div class="modal-dialog modal-sm">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="registerModalLongTitle">Sign Up</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form action="/register" method="POST">
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label for="inputUserName">Username</label>
+                                <input class="form-control" placeholder="Username" type="text" id="registerInputUserName" name = "username" required/>
+                            </div>
+                            <div class="form-group">
+                                <label for="inputPassword">Password</label>
+                                <input class="form-control" placeholder="Password" type="password" id="registerInputPassword" name="password" required />
+                            </div>
+                            <div class="form-group">
+                                <input class="form-control" placeholder="Confirm Password" type="password" id="registerInputConfirmPassword" name="confirmPassword" required />
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-primary">Sign Up</button>
+                            <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+
+
+        <!-- remove carousel-fade forsliding effect instead of transition -->
+        <div id="background">
+            
+        </div>
+        

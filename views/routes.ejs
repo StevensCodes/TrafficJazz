@@ -1,0 +1,482 @@
+<% include partials/header.ejs %>
+
+        <div class="container">
+            <div class="row">
+                <div class="future">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="container">
+                                <p id="future-head">Monitor how long a route takes</p>
+                                <div class="form-group">
+                                    <input id="fromRoute" class="form-control" placeholder="Starting Address"/>
+                                </div>
+                                <div class="form-group">
+                                    <input id="toRoute" class="form-control" placeholder="Destination Address"/>
+                                </div>
+                                <button id="submitRoute" class="btn btn-primary">Search</button>
+                                <span class="places">Map zoom: <a href="javascript:;" id="LA">LA</a>, <a href="javascript:;" id="NY">NY</a>, <a href="javascript:;" id="US">USA</a>, <a href="javascript:;" id="EU">Europe</a>, <a href="javascript:;" id="AS">Asia</a>, <a href="javascript:;" ID="WR">World</a></span>
+                                <button style="float: right;" id="monitorRoute" class="btn btn-secondary">Monitor</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="world-background" style="background-color: darkgrey;">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="world-box">
+                            <div class="container">
+                                <h1 class="world-msg col-lg-12">My routes</h1>
+                                <hr>
+
+                                <% for(var i = 0; i < data.length; i++) { %>
+
+
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <h5 class="route-label-lg col-lg-12" style="padding-top: 25px;"><span id="data_0<%=i%>"><%= data[i][0]%></span><pre> - </pre><span id="data_1<%=i%>"><%= data[i][1]%></span></h5>
+                                            <button style="display: none; float: right; margin-bottom: 15px; width: 120px; margin-left: 15px;" id="deleteRouteCancel_<%=i%>" class="btn btn-info btn-sm">Cancel</button>
+                                            <button style="float: right; margin-bottom: 15px; width: 120px; margin-left: 15px;" id="deleteRoute_<%=i%>" class="btn btn-danger btn-sm">Delete</button>
+                                            <button style="display: none; float: right; margin-bottom: 15px; width: 120px; margin-left: 15px;" disabled="disabled" id="deleteRouteQuestion_<%=i%>" class="btn btn-link btn-sm">Delete Route?</button>
+                                        </div>
+                                        <div id="trip_<%=i%>" class="trip col-lg-12 col-md-12">
+    
+                                        </div>
+                                    </div>      
+                                    
+                                    <div class="row">
+                                        
+                                        <div class="trip col-lg-6 col-md-6">
+                                            <div class="route-label-sm">There</div>
+                                            
+                                                <div class="chart-line" id="chart_0<%=i%>"></div>
+                                                <div class="chart-buttons">
+                                                    <button id="weekdays_0<%=i%>" class="btn btn-sm">Weekdays</button>
+                                                    <button id="average_0<%=i%>" class="btn btn-sm">Average</button>
+                                                    <button id="weekends_0<%=i%>" class="btn btn-sm">Weekends</button>
+                                                </div>
+    
+                                        </div>
+                                        <div class="trip col-lg-6 col-md-6">
+                                            <div class="route-label-sm">Back</div>
+    
+                                                <div class="chart-line" id="chart_1<%=i%>"></div>
+                                                <div class="chart-buttons">
+                                                    <button id="weekdays_1<%=i%>" class="btn btn-sm">Weekdays</button>
+                                                    <button id="average_1<%=i%>" class="btn btn-sm">Average</button>
+                                                    <button id="weekends_1<%=i%>" class="btn btn-sm">Weekends</button>
+                                                </div>
+    
+                                        </div>
+
+                                        <div style="display: none;" id="graphData_0<%=i%>0"><%= data[i][2][0]%></div>
+                                        <div style="display: none;" id="graphData_0<%=i%>1"><%= data[i][2][1]%></div>
+                                        <div style="display: none;" id="graphData_0<%=i%>2"><%= data[i][2][2]%></div>
+                                        <div style="display: none;" id="graphData_0<%=i%>3"><%= data[i][2][3]%></div>
+                                        <div style="display: none;" id="graphData_0<%=i%>4"><%= data[i][2][4]%></div>
+                                        <div style="display: none;" id="graphData_0<%=i%>5"><%= data[i][2][5]%></div>
+                                        <div style="display: none;" id="graphData_0<%=i%>6"><%= data[i][2][6]%></div>
+                                        
+                                        <div style="display: none;" id="graphData_1<%=i%>0"><%= data[i][3][0]%></div>
+                                        <div style="display: none;" id="graphData_1<%=i%>1"><%= data[i][3][1]%></div>
+                                        <div style="display: none;" id="graphData_1<%=i%>2"><%= data[i][3][2]%></div>
+                                        <div style="display: none;" id="graphData_1<%=i%>3"><%= data[i][3][3]%></div>
+                                        <div style="display: none;" id="graphData_1<%=i%>4"><%= data[i][3][4]%></div>
+                                        <div style="display: none;" id="graphData_1<%=i%>5"><%= data[i][3][5]%></div>
+                                        <div style="display: none;" id="graphData_1<%=i%>6"><%= data[i][3][6]%></div>
+
+                                    </div>
+
+                                <% } %>
+
+
+                            </div>
+                        </div>
+                    </div>
+                </div>    
+            </div>
+        </div>
+
+
+
+
+
+<% include partials/footerMenu.ejs %>
+
+
+
+
+       <script>
+
+            function initMap() {
+                var directionsService = new google.maps.DirectionsService;
+                var directionsDisplay = new google.maps.DirectionsRenderer;
+                var map = new google.maps.Map(document.getElementById('background'), {
+                    zoom: 10,
+                    center: {lat: 33.990, lng: -118.100}
+                });
+                directionsDisplay.setMap(map);
+                
+                var trafficLayer = new google.maps.TrafficLayer();
+                    trafficLayer.setMap(map);              
+                
+                
+
+                var onChangeHandler = function() {
+                    calculateAndDisplayRoute(directionsService, directionsDisplay, document.getElementById('fromRoute').value, document.getElementById('toRoute').value);
+                };
+             
+                document.getElementById('submitRoute').addEventListener('click', onChangeHandler);
+                
+                document.getElementById('toRoute').addEventListener('keyup', function(event)    {
+                    if (event.keyCode === 13) {
+                        document.getElementById('submitRoute').click();
+                        }
+                });       
+                
+                var onLA = function() {
+                    map.setCenter({lat: 33.990, lng: -118.100});
+                    map.setZoom(10);
+                }
+                document.getElementById('LA').addEventListener('click', onLA);
+
+                var onNY = function() {
+                    map.setCenter({lat: 40.728, lng: -73.985});                    
+                    map.setZoom(10);
+                }
+                document.getElementById('NY').addEventListener('click', onNY);
+
+                var onUS = function() {
+                    map.setCenter({lat: 39.000, lng: -96.000});
+                    map.setZoom(5);
+                }
+                document.getElementById('US').addEventListener('click', onUS);
+
+                var onEU = function() {
+                    map.setCenter({lat: 49.000, lng: 8.000});
+                    map.setZoom(5);
+                }
+                document.getElementById('EU').addEventListener('click', onEU);
+
+                var onAS = function() {
+                    map.setCenter({lat: 28.900, lng: 104.700});
+                    map.setZoom(5);
+                }
+                document.getElementById('AS').addEventListener('click', onAS);
+
+                var onWR = function() {
+                    map.setCenter({lat: 17.000, lng: 12.000});
+                    map.setZoom(3);
+                }
+                document.getElementById('WR').addEventListener('click', onWR);
+
+                var directionsServiceTrip = [];
+                var directionsDisplayTrip = [];
+                var mapTrip = [];
+                var trafficLayerTrip = [];
+                var direction = [];
+                var directions = [];
+                for (i = 0; i < <%= data.length %>; i++) {
+                    direction.push(document.getElementById("data_0" + i).innerHTML);
+                    direction.push(document.getElementById("data_1" + i).innerHTML);
+                    directions.push(direction);
+                    direction = [];
+                    
+                      
+                    
+                }
+
+                for (i = 0; i < <%= data.length %>; i++) {
+                    directionsServiceTrip.push(new google.maps.DirectionsService);
+                    directionsDisplayTrip.push(new google.maps.DirectionsRenderer);
+                    mapTrip.push(new google.maps.Map(document.getElementById('trip_' + i), {
+                        zoom: 10,
+                        center: {lat: 33.990, lng: -118.100},
+                        gestureHandling: 'none'
+                    }));
+                    directionsDisplayTrip[i].setMap(mapTrip[i]);
+                    trafficLayerTrip.push(new google.maps.TrafficLayer());
+                    trafficLayerTrip[i].setMap(mapTrip[i]);
+                    calculateAndDisplayRoute(directionsServiceTrip[i], directionsDisplayTrip[i], directions[i][0], directions[i][1]);
+                }	 
+                
+            }
+            
+            function calculateAndDisplayRoute(directionsService, directionsDisplay, origin, destination) {
+                directionsService.route({
+                    origin: origin,
+                    destination: destination,
+                    travelMode: 'DRIVING'
+                }, function(response, status) {
+                    if (status === 'OK') {
+                        directionsDisplay.setDirections(response);
+                    } else {
+                        window.alert('Directions request failed due to ' + status);
+                    }
+                });
+            }
+    
+            
+            function post(path, params, method) {
+                method = method || "post"; // Set method to post by default if not specified.
+            
+                // The rest of this code assumes you are not using a library.
+                // It can be made less wordy if you use one.
+                var form = document.createElement("form");
+                form.setAttribute("method", method);
+                form.setAttribute("action", path);
+            
+                for(var key in params) {
+                    if(params.hasOwnProperty(key)) {
+                        var hiddenField = document.createElement("input");
+                        hiddenField.setAttribute("type", "hidden");
+                        hiddenField.setAttribute("name", key);
+                        hiddenField.setAttribute("value", params[key]);
+            
+                        form.appendChild(hiddenField);
+                    }
+                }
+            
+                document.body.appendChild(form);
+                form.submit();
+            }
+
+            
+            document.getElementById('monitorRoute').addEventListener('click', function(event)    {
+                var fromRoute = document.getElementById('fromRoute').value;
+                var toRoute = document.getElementById('toRoute').value;
+
+                if (fromRoute && toRoute ) {
+                    post('/monitor', {monitorFrom: fromRoute, monitorTo: toRoute});
+                }
+            });       
+
+
+        </script>
+        
+        <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBtdIJa9cKkZSLV0kMKqtTi7MpXUWGM0Pk&callback=initMap">
+        </script>
+        
+		<script>
+
+		    var charts = [];
+
+    		for (var i = 0; i < <%= data.length %>; i++) {
+    		
+    		    for (var j = 0; j < 2; j++) {
+
+                    var d = {};
+                    
+                    var mon = document.getElementById("graphData_" + j + '' + i + '' + 0).innerHTML.split(',');
+                    var tue = document.getElementById("graphData_" + j + '' + i + '' + 1).innerHTML.split(',');
+                    var wed = document.getElementById("graphData_" + j + '' + i + '' + 2).innerHTML.split(',');
+                    var thu = document.getElementById("graphData_" + j + '' + i + '' + 3).innerHTML.split(',');
+                    var fri = document.getElementById("graphData_" + j + '' + i + '' + 4).innerHTML.split(',');
+                    var sat = document.getElementById("graphData_" + j + '' + i + '' + 5).innerHTML.split(',');
+                    var sun = document.getElementById("graphData_" + j + '' + i + '' + 6).innerHTML.split(',');
+
+                    
+
+                    var c = {};
+                    
+                    c.columns  = [];
+                    
+                    c.columns.push(mon);
+                    c.columns.push(tue);
+                    c.columns.push(wed);
+                    c.columns.push(thu);
+                    c.columns.push(fri);
+                    c.columns.push(sat);
+                    c.columns.push(sun);
+                    
+                    var avg = [];
+                    avg.push('Average');
+                    var a = 0;
+                    var e = 0;
+                    
+                    for (var v = 0; v < 96; v++){
+
+                        if (!isNaN(mon[v + 1]) && mon[v + 1] > 0) { a += Number(mon[v + 1]); e++; }
+                        if (!isNaN(tue[v + 1]) && tue[v + 1] > 0) { a += Number(tue[v + 1]); e++; }
+                        if (!isNaN(wed[v + 1]) && wed[v + 1] > 0) { a += Number(wed[v + 1]); e++; }
+                        if (!isNaN(thu[v + 1]) && thu[v + 1] > 0) { a += Number(thu[v + 1]); e++; }
+                        if (!isNaN(fri[v + 1]) && fri[v + 1] > 0) { a += Number(fri[v + 1]); e++; }
+                        
+                        if (e > 0) {
+                            avg.push(Math.round(a / e));
+                        } else {
+                            avg.push('x');
+                        }
+                        a = 0;
+                        e = 0;
+                    }
+                    
+                    c.columns.push(avg);
+                    
+                    d.data = c;
+                    
+                    
+                    d.padding = { top: 0, right: 15 };
+                        
+                    d.zoom = { enabled: false };
+                        
+                    d.bindto = '#chart_' + j + '' + i;
+
+                    d.point = { show: false },
+                    
+                    d.axis = {
+                                y: {
+                                    label: {
+                                        text: 'Minutes',
+                                        position: 'outer-middle'
+                                    }
+                                  },
+                                x: {
+                                    type: 'category',
+                                    categories: ['0:00 AM','0:15 AM','0:30 AM','0:45 AM','1:00 AM','1:15 AM','1:30 AM','1:45 AM','2:00 AM','2:15 AM','2:30 AM','2:45 AM','3:00 AM','3:15 AM','3:30 AM','3:45 AM','4:00 AM','4:15 AM','4:30 AM','4:45 AM','5:00 AM','5:15 AM','5:30 AM','5:45 AM','6:00 AM','6:15 AM','6:30 AM','6:45 AM','7:00 AM','7:15 AM','7:30 AM','7:45 AM','8:00 AM','8:15 AM','8:30 AM','8:45 AM','9:00 AM','9:15 AM','9:30 AM','9:45 AM','10:00 AM','10:15 AM','10:30 AM','10:45 AM','11:00 AM','11:15 AM','11:30 AM','11:45 AM','12:00 PM','12:15 PM','12:30 PM','12:45 PM','1:00 PM','1:15 PM','1:30 PM','1:45 PM','2:00 PM','2:15 PM','2:30 PM','2:45 PM','3:00 PM','3:15 PM','3:30 PM','3:45 PM','4:00 PM','4:15 PM','4:30 PM','4:45 PM','5:00 PM','5:15 PM','5:30 PM','5:45 PM','6:00 PM','6:15 PM','6:30 PM','6:45 PM','7:00 PM','7:15 PM','7:30 PM','7:45 PM','8:00 PM','8:15 PM','8:30 PM','8:45 PM','9:00 PM','9:15 PM','9:30 PM','9:45 PM','10:00 PM','10:15 PM','10:30 PM','10:45 PM','11:00 PM','11:15 PM','11:30 PM','11:45 PM'],
+                                    show: false
+                                }
+                            };
+
+                    d.grid = {
+                                x: {
+                                    lines: [
+                                        {value: 8, text: '' },{value: 16, text: '' },{value: 24, text: '' },{value: 32, text: '' },{value: 40, text: '' },{value: 48, text: '' },{value: 56, text: '' },{value: 64, text: '' },{value: 72, text: '' },{value: 80, text: '' },{value: 88, text: '' }
+                                            ]
+                                },
+                                y: {
+                                    show: true
+                                }
+                            };
+
+                    d.legend = { show: false };
+
+                    d.tooltip = {
+                                format: {
+                                    value: function (value, ratio, id, index) { 
+                                        var hr = Math.floor(value / 60);
+                                        var min = value % 60 + ' min';
+                                        if (hr == 0) {
+                                            hr = ''
+                                        }
+                                        else {
+                                            hr = hr + ' hr '
+                                        }
+                                        return  hr + min; 
+                                    }
+                                }
+                            };
+
+        			var chart = c3.generate(d);
+                    
+                    charts.push(chart);
+                
+    		    }
+            
+            }
+            
+            document.addEventListener('click',function(e){
+                if(e.target && e.target.id.startsWith('weekdays_0')){
+                    charts[e.target.id.replace('weekdays_0', '') * 2].show(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']);
+                    charts[e.target.id.replace('weekdays_0', '') * 2].hide(['Average', 'Saturday', 'Sunday']);
+                    document.getElementById('weekdays_0' + e.target.id.replace('weekdays_0', '')).classList.add('btn-primary');
+                    document.getElementById('average_0' + e.target.id.replace('weekdays_0', '')).classList.remove('btn-primary');
+                    document.getElementById('weekends_0' + e.target.id.replace('weekdays_0', '')).classList.remove('btn-primary');
+                }
+            })
+            
+             document.addEventListener('click',function(e){
+                if(e.target && e.target.id.startsWith('average_0')){
+                    charts[e.target.id.replace('average_0', '') * 2].show(['Average']);
+                    charts[e.target.id.replace('average_0', '') * 2].hide(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']);
+                    document.getElementById('weekdays_0' + e.target.id.replace('average_0', '')).classList.remove('btn-primary');
+                    document.getElementById('average_0' + e.target.id.replace('average_0', '')).classList.add('btn-primary');
+                    document.getElementById('weekends_0' + e.target.id.replace('average_0', '')).classList.remove('btn-primary');
+                }
+            })
+                    
+             document.addEventListener('click',function(e){
+                if(e.target && e.target.id.startsWith('weekends_0')){
+                    charts[e.target.id.replace('weekends_0', '') * 2].show(['Saturday', 'Sunday']);
+                    charts[e.target.id.replace('weekends_0', '') * 2].hide(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Average']);
+                    document.getElementById('weekdays_0' + e.target.id.replace('weekends_0', '')).classList.remove('btn-primary');
+                    document.getElementById('average_0' + e.target.id.replace('weekends_0', '')).classList.remove('btn-primary');
+                    document.getElementById('weekends_0' + e.target.id.replace('weekends_0', '')).classList.add('btn-primary');
+                }
+            })
+
+                    
+            document.addEventListener('click',function(e){
+                if(e.target && e.target.id.startsWith('weekdays_1')){
+                    charts[e.target.id.replace('weekdays_1', '') * 2 + 1].show(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']);
+                    charts[e.target.id.replace('weekdays_1', '') * 2 + 1].hide(['Average', 'Saturday', 'Sunday']);
+                    document.getElementById('weekdays_1' + e.target.id.replace('weekdays_1', '')).classList.add('btn-primary');
+                    document.getElementById('average_1' + e.target.id.replace('weekdays_1', '')).classList.remove('btn-primary');
+                    document.getElementById('weekends_1' + e.target.id.replace('weekdays_1', '')).classList.remove('btn-primary');
+                }
+            })
+            
+             document.addEventListener('click',function(e){
+                if(e.target && e.target.id.startsWith('average_1')){
+                    charts[e.target.id.replace('average_1', '') * 2 + 1].show(['Average']);
+                    charts[e.target.id.replace('average_1', '') * 2 + 1].hide(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']);
+                    document.getElementById('weekdays_1' + e.target.id.replace('average_1', '')).classList.remove('btn-primary');
+                    document.getElementById('average_1' + e.target.id.replace('average_1', '')).classList.add('btn-primary');
+                    document.getElementById('weekends_1' + e.target.id.replace('average_1', '')).classList.remove('btn-primary');
+                }
+            })
+                    
+             document.addEventListener('click',function(e){
+                if(e.target && e.target.id.startsWith('weekends_1')){
+                    charts[e.target.id.replace('weekends_1', '') * 2 + 1].show(['Saturday', 'Sunday']);
+                    charts[e.target.id.replace('weekends_1', '') * 2 + 1].hide(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Average']);
+                    document.getElementById('weekdays_1' + e.target.id.replace('weekends_1', '')).classList.remove('btn-primary');
+                    document.getElementById('average_1' + e.target.id.replace('weekends_1', '')).classList.remove('btn-primary');
+                    document.getElementById('weekends_1' + e.target.id.replace('weekends_1', '')).classList.add('btn-primary');
+                }
+            })
+            
+
+            for (var i = 0; i < <%= data.length %>; i++) {
+                
+                for (var j = 0; j < 2; j++) {
+                    
+                    document.getElementById('weekdays_' + j + '' + i).click();
+                    
+                }
+            }
+
+            document.addEventListener('click',function(e){
+                if(e.target && e.target.id.startsWith('deleteRoute_')){
+
+                    if (document.getElementById('deleteRouteCancel_' + e.target.id.replace('deleteRoute_', '')).style.cssText == "display: none; float: right; margin-bottom: 15px; width: 120px; margin-left: 15px;"){
+                        document.getElementById('deleteRouteCancel_' + e.target.id.replace('deleteRoute_', '')).style.cssText = "display: inline; float: right; margin-bottom: 15px; width: 120px; margin-left: 15px;";
+                        document.getElementById('deleteRouteQuestion_' + e.target.id.replace('deleteRoute_', '')).style.cssText = "display: inline; float: right; margin-bottom: 15px; width: 120px; margin-left: 15px;";
+                        document.getElementById('deleteRoute_' + e.target.id.replace('deleteRoute_', '')).blur();
+                    } else {
+                        var df = document.getElementById('data_' + '0' + e.target.id.replace('deleteRoute_', '')).innerHTML;
+                        var dt = document.getElementById('data_' + '1' + e.target.id.replace('deleteRoute_', '')).innerHTML;
+                        
+                        post('/delete', {deleteFrom: df, deleteTo: dt});
+                    }
+                }
+            })
+
+            document.addEventListener('click',function(e){
+                if(e.target && e.target.id.startsWith('deleteRouteCancel_')){
+                    document.getElementById('deleteRouteCancel_' + e.target.id.replace('deleteRouteCancel_', '')).style.cssText = "display: none; float: right; margin-bottom: 15px; width: 120px; margin-left: 15px;";
+                    document.getElementById('deleteRouteQuestion_' + e.target.id.replace('deleteRouteCancel_', '')).style.cssText = "display: none; float: right; margin-bottom: 15px; width: 120px; margin-left: 15px;";
+                }
+            })
+
+
+
+		</script>
+
+    </body>
+</html>
+
+

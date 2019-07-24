@@ -1,0 +1,170 @@
+<% include partials/header.ejs %>
+
+        <div class="container">
+            <div class="row">
+                <div class="future">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="container">
+                                <p id="future-head">Monitor how long a route takes</p>
+                                <div class="form-group">
+                                    <input id="fromRoute" class="form-control" placeholder="Starting Address"/>
+                                </div>
+                                <div class="form-group">
+                                    <input id="toRoute" class="form-control" placeholder="Destination Address"/>
+                                </div>
+                                <button id="submitRoute" class="btn btn-primary">Search</button>
+                                <span class="places">Map zoom: <a href="javascript:;" id="LA">LA</a>, <a href="javascript:;" id="NY">NY</a>, <a href="javascript:;" id="US">USA</a>, <a href="javascript:;" id="EU">Europe</a>, <a href="javascript:;" id="AS">Asia</a>, <a href="javascript:;" ID="WR">World</a></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <h2 class="power-message">Do you want to know how long it takes to drive<br>between two places based on the time of day?</h2>
+                        <p class="welcome-kit">Sign in and we'll monitor it for you<br>every 15 minutes for a week.<br> No e-mail required.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="world-background" style="background-color: lightgray;">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="world-box">
+                            <div class="container">
+                                <h1 class="world-msg col-lg-12">Example result of a monitored route</h1>
+                                <img src="/RoutesScreenshot.png" alt="Image.jpg" style="width: 100%;">
+                            </div>
+                        </div>
+                    </div>
+                </div>    
+            </div>
+        </div>
+
+<% include partials/footerMenu.ejs %>
+
+
+         <script>
+         
+            function initMap() {
+                var directionsService = new google.maps.DirectionsService;
+                var directionsDisplay = new google.maps.DirectionsRenderer;
+                var map = new google.maps.Map(document.getElementById('background'), {
+                    zoom: 10,
+                    center: {lat: 33.990, lng: -118.100}
+                });
+                directionsDisplay.setMap(map);
+                
+                var trafficLayer = new google.maps.TrafficLayer();
+                    trafficLayer.setMap(map);              
+                
+                
+                var onChangeHandler = function() {
+                    calculateAndDisplayRoute(directionsService, directionsDisplay, document.getElementById('fromRoute').value, document.getElementById('toRoute').value);
+                };
+             
+                document.getElementById('submitRoute').addEventListener('click', onChangeHandler);
+                
+                document.getElementById('toRoute').addEventListener('keyup', function(event)    {
+                    if (event.keyCode === 13) {
+                        document.getElementById('submitRoute').click();
+                        }
+                });       
+
+                var onLA = function() {
+                    map.setCenter({lat: 33.990, lng: -118.100});
+                    map.setZoom(10);
+                }
+                document.getElementById('LA').addEventListener('click', onLA);
+
+                var onNY = function() {
+                    map.setCenter({lat: 40.728, lng: -73.985});                    
+                    map.setZoom(10);
+                }
+                document.getElementById('NY').addEventListener('click', onNY);
+
+                var onUS = function() {
+                    map.setCenter({lat: 39.000, lng: -96.000});
+                    map.setZoom(5);
+                }
+                document.getElementById('US').addEventListener('click', onUS);
+
+                var onEU = function() {
+                    map.setCenter({lat: 49.000, lng: 8.000});
+                    map.setZoom(5);
+                }
+                document.getElementById('EU').addEventListener('click', onEU);
+
+                var onAS = function() {
+                    map.setCenter({lat: 28.900, lng: 104.700});
+                    map.setZoom(5);
+                }
+                document.getElementById('AS').addEventListener('click', onAS);
+
+                var onWR = function() {
+                    map.setCenter({lat: 17.000, lng: 12.000});
+                    map.setZoom(3);
+                }
+                document.getElementById('WR').addEventListener('click', onWR);
+                
+            }
+
+
+
+            function calculateAndDisplayRoute(directionsService, directionsDisplay, origin, destination) {
+                directionsService.route({
+                    origin: origin,
+                    destination: destination,
+                    travelMode: 'DRIVING'
+                }, function(response, status) {
+                    if (status === 'OK') {
+                        directionsDisplay.setDirections(response);
+                    } else {
+                        window.alert('Directions request failed due to ' + status);
+                    }
+                });
+            }
+    
+
+            function post(path, params, method) {
+                method = method || "post"; // Set method to post by default if not specified.
+            
+                // The rest of this code assumes you are not using a library.
+                // It can be made less wordy if you use one.
+                var form = document.createElement("form");
+                form.setAttribute("method", method);
+                form.setAttribute("action", path);
+            
+                for(var key in params) {
+                    if(params.hasOwnProperty(key)) {
+                        var hiddenField = document.createElement("input");
+                        hiddenField.setAttribute("type", "hidden");
+                        hiddenField.setAttribute("name", key);
+                        hiddenField.setAttribute("value", params[key]);
+            
+                        form.appendChild(hiddenField);
+                    }
+                }
+            
+                document.body.appendChild(form);
+                form.submit();
+            }
+            
+        </script>
+
+        <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBtdIJa9cKkZSLV0kMKqtTi7MpXUWGM0Pk&callback=initMap">
+        </script>
+
+    </body>
+</html>
+        
+
+
+		
